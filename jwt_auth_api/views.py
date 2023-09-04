@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from jwt_auth_api.models import User
-from jwt_auth_api.serializers import UserChangePasswordSerializer, UserLoginSerializer, UserProfileSerializer, UserRegistrationSerializer
+from jwt_auth_api.serializers import SendPasswordResetEmailSerializer, UserChangePasswordSerializer, UserLoginSerializer, UserProfileSerializer, UserRegistrationSerializer, UserPasswordResetSerializer
 from jwt_auth_api.renderers import UserRenderer
 
 
@@ -73,4 +73,20 @@ class UserChangePasswordView(APIView):
         serializer = UserChangePasswordSerializer(data=request.data, context = {'user': request.user})
         serializer.is_valid(raise_exception=True)
         return Response({'msg': 'Password Changed Successfully'}, status=status.HTTP_200_OK)
+
+class SendPasswordResetEmailView(APIView):
+    renderer_classes = [UserRenderer]
+
+    def post(self, request, format=None):
+        serializer = SendPasswordResetEmailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response({'msg': 'Password Reset Link Sent Successfully. Please check your Email'}, status=status.HTTP_200_OK)
+
+class UserPasswordResetView(APIView):
+    renderer_classes = [UserRenderer]
+
+    def post(self, request, uid, token, format=None):
+        serializer = UserPasswordResetSerializer(data=request.data, context={'uid' : uid, 'token': token})
+        serializer.is_valid(raise_exception=True)
+        return Response({'msg': 'Password Reset Successfully.'}, status=status.HTTP_200_OK)
 
