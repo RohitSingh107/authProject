@@ -1,8 +1,10 @@
+from datetime import date, datetime
 from rest_framework import serializers
 from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from jwt_auth_api.models import User
+from jwt_auth_api.utils import Util
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
   # # We are writing this becoz we need confirm password field in our Registratin Request
@@ -20,6 +22,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         )
         user.set_password(validated_data['password'])
         user.save()
+
         return user
 
 class UserLoginSerializer(serializers.ModelSerializer):
@@ -69,7 +72,15 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
             token = PasswordResetTokenGenerator().make_token(user=user)
 
             link = 'http://localhost:8000/api/user/reset/' + euid + '/' + token
-            print("Password reset link: ", link)
+
+            body = "Click Following Link to Reset Your Password: " + link
+            data= {
+                "subject": "Reset Your Password",
+                "body": body,
+                "to_email": [user.email],
+            }
+            Util.send_email(data=data)
+            # print("Password reset link: ", link)
             return attrs
         else:
             raise serializers.ValidationError('You are not a registered user.')
@@ -99,4 +110,10 @@ class UserPasswordResetSerializer(serializers.Serializer):
         user.set_password(password)
         user.save()
 
+        data= {
+            "subject": "Password Reset Successfull",
+            "body": f"Password is successfully reset at {datetime.now()}",
+            "to_email": [user.email],
+        }
+        Util.send_email(data=data)
         return attrs

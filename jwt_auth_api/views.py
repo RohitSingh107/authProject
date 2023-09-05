@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate
 from jwt_auth_api.models import User
 from jwt_auth_api.serializers import SendPasswordResetEmailSerializer, UserChangePasswordSerializer, UserLoginSerializer, UserProfileSerializer, UserRegistrationSerializer, UserPasswordResetSerializer
 from jwt_auth_api.renderers import UserRenderer
+from jwt_auth_api.utils import Util
 
 
 
@@ -35,8 +36,15 @@ class UserRegistrationView(APIView):
         # user = User.objects.create_user(email=email, tc=tc, name=name) 
         # user.set_password(password)
         # user.save()
-
         token = get_tokens_for_user(user=user)
+        body = f"Thans for Registratin! Your access tokens are {token}"
+        data = {
+            "subject": "Registratin Successfully",
+            "body": body,
+            "to_email": [user.email],
+        }
+        Util.send_email(data=data)
+
         return Response({'token' : token, 'msg' : 'Registration successful!'}, status=status.HTTP_201_CREATED)
 
 class UserLoginView(APIView):
