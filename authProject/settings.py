@@ -1,3 +1,4 @@
+# https://www.youtube.com/watch?v=lo7lBD9ynVc # Reference
 """
 Django settings for authProject project.
 
