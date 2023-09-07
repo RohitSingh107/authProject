@@ -4,7 +4,6 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from jwt_auth_api.models import User
 from jwt_auth_api.serializers import SendPasswordResetEmailSerializer, UserChangePasswordSerializer, UserLoginSerializer, UserProfileSerializer, UserRegistrationSerializer, UserPasswordResetSerializer
 from jwt_auth_api.renderers import UserRenderer
 from jwt_auth_api.utils import Util
